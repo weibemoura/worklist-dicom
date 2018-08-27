@@ -1,0 +1,16 @@
+**/.pyc
+**/.sqlite3
+**/.env
+
+**/.vscode/*
+**/.cache/*
+**/__pycache__/*
+**/tmp/*
+**/.idea/*
+**/.venv/*
+**/staticfiles/*
+**/assetsfiles/*
+**/media/*
+**/.sass-cache/*
+
+**/docker-storage/*

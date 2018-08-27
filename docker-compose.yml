@@ -1,0 +1,29 @@
+version: '3'
+services:
+  worklist:
+    build: $PWD/dcmtk
+    image: local:worklist
+    container_name: worklist
+    ports:
+      - 105:105
+    volumes:
+      - /opt/worklist:/data:rw
+    environment:
+      DCMDICTPATH: '/usr/share/dcmtk/dicom.dic'
+    command: 'wlmscpfs -d -dfp "/data" 105'
+
+  web:
+    build: ./webapp/docker
+    image: local:web
+    container_name: web
+    working_dir: /data/web
+    tty: true
+    stdin_open: true
+    ports:
+      - 80:8080
+    volumes:
+      - ./webapp:/data/web:rw
+      - /opt/worklist:/data/worklist:rw
+    entrypoint: '/data/web/docker-entrypoint.sh'
+
+
