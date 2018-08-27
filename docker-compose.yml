@@ -24,6 +24,6 @@ services:
     volumes:
       - ./webapp:/data/web:rw
       - /opt/worklist:/data/worklist:rw
-    entrypoint: '/data/web/docker-entrypoint.sh'
+    entrypoint: '/data/web/docker/docker-entrypoint.sh'
 
 
