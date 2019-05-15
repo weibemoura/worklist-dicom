@@ -8,7 +8,11 @@ Dicom worklist generator compatible with wlmscpfs (dcmtk)
 CACHE_FILE=contrib/cache.bin
 HEADER_FILE=contrib/header.bin
 
+WORKLIST_ADDRESS=dicom.weibe.com.br
+WORKLIST_PORT=105
 WORKLIST_DIR=/data/worklist/FINDSCU
+CALLING_AE_TITLE=FINDSCU
+CALLED_AE_TITLE=ANY-SCP
 
 # create python virtualenv
 python3 -m venv .venv

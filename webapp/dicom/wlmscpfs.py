@@ -1,7 +1,7 @@
-import os
-from struct import pack
+import os as _os
+from struct import pack as _pack
 
-from decouple import config
+from decouple import config as _config
 
 # https://www.dicomlibrary.com/dicom/dicom-tags/
 # https://support.dcmtk.org/docs/wlmscpfs.html
@@ -20,7 +20,7 @@ def __calculate_space_list(values):
 
 def __write_code(file, code):
     for base in code.split(","):
-        file.write(pack("H", int(base, 16)))
+        file.write(_pack("H", int(base, 16)))
 
 
 def __write_datatype(file, datatype):
@@ -37,10 +37,10 @@ def __write_property(file, code, datatype, content):
             content += " "
 
         content = content.encode()
-        file.write(pack("I", len(content))[:2])
+        file.write(_pack("I", len(content))[:2])
         file.write(content)
     else:
-        file.write(pack("I", content))
+        file.write(_pack("I", content))
 
 
 def __write_sequence(file, code, datatype, values=[]):
@@ -50,25 +50,25 @@ def __write_sequence(file, code, datatype, values=[]):
     size = __calculate_space_list(values)
 
     file.write(bytes([0, 0]))
-    file.write(pack("I", size))
+    file.write(_pack("I", size))
 
     __write_code(file, "FFFE,E000")
-    file.write(pack("I", size - 8))
+    file.write(_pack("I", size - 8))
 
 
-def clear_file_wl():
-    dir_worklist = config("WORKLIST_DIR")
-    for item in os.listdir(dir_worklist):
+def remove_all_worklist():
+    dir_worklist = _config("WORKLIST_DIR")
+    for item in _os.listdir(dir_worklist):
         if item.endswith(".wl"):
-            os.remove(os.path.join(dir_worklist, item))
+            _os.remove(_os.path.join(dir_worklist, item))
 
 
-def write_file_wl(worklists):
-    header = open(config("HEADER_FILE"), "rb").read(360)
+def write_file_worklist(data):
+    header = open(_config("HEADER_FILE"), "rb").read(360)
 
-    dir_worklist = config("WORKLIST_DIR")
-    for worklist in worklists:
-        file_worklist = os.path.join(dir_worklist, f"{worklist.patient_id}.wl")
+    dir_worklist = _config("WORKLIST_DIR")
+    for worklist in data:
+        file_worklist = _os.path.join(dir_worklist, f"{worklist.patient_id}.wl")
         with open(file_worklist, "wb") as f:
             f.write(header)
 
@@ -91,9 +91,7 @@ def write_file_wl(worklists):
             __write_property(f, "0010,2110", "LO", worklist.contrast_allergies)
             __write_property(f, "0020,000d", "UI", worklist.study_instance_uid)
             __write_property(f, "0032,1032", "PN", worklist.requesting_physician)
-            __write_property(
-                f, "0032,1060", "LO", worklist.requested_procedure_description
-            )
+            __write_property(f, "0032,1060", "LO", worklist.requested_procedure_description)
 
             values = [
                 worklist.modality,
@@ -115,32 +113,16 @@ def write_file_wl(worklists):
             __write_property(f, "0008,0060", "CS", worklist.modality)
             __write_property(f, "0032,1070", "LO", worklist.requested_contrast_agent)
             __write_property(f, "0040,0001", "AE", worklist.scheduled_station_aetitle)
-            __write_property(
-                f, "0040,0002", "DA", worklist.scheduled_procedure_step_startdate
-            )
-            __write_property(
-                f, "0040,0003", "TM", worklist.scheduled_procedure_step_starttime
-            )
-            __write_property(
-                f, "0040,0004", "DA", worklist.scheduled_procedure_step_enddate
-            )
-            __write_property(
-                f, "0040,0005", "TM", worklist.scheduled_procedure_step_endtime
-            )
-            __write_property(
-                f, "0040,0006", "PN", worklist.scheduled_performing_physician_name
-            )
-            __write_property(
-                f, "0040,0007", "LO", worklist.scheduled_procedure_step_description
-            )
+            __write_property(f, "0040,0002", "DA", worklist.scheduled_procedure_step_startdate)
+            __write_property(f, "0040,0003", "TM", worklist.scheduled_procedure_step_starttime)
+            __write_property(f, "0040,0004", "DA", worklist.scheduled_procedure_step_enddate)
+            __write_property(f, "0040,0005", "TM", worklist.scheduled_procedure_step_endtime)
+            __write_property(f, "0040,0006", "PN", worklist.scheduled_performing_physician_name)
+            __write_property(f, "0040,0007", "LO", worklist.scheduled_procedure_step_description)
             __write_property(f, "0040,0009", "SH", worklist.scheduled_procedure_step_id)
             __write_property(f, "0040,0010", "SH", worklist.scheduled_station_name)
-            __write_property(
-                f, "0040,0011", "SH", worklist.scheduled_procedure_step_location
-            )
+            __write_property(f, "0040,0011", "SH", worklist.scheduled_procedure_step_location)
             __write_property(f, "0040,0012", "LO", worklist.pre_medication)
-            __write_property(
-                f, "0040,0020", "CS", worklist.scheduled_procedure_step_status
-            )
+            __write_property(f, "0040,0020", "CS", worklist.scheduled_procedure_step_status)
 
             __write_property(f, "0040,1001", "SH", "5000")
