@@ -6,6 +6,20 @@ from decouple import config as _config
 # https://www.dicomlibrary.com/dicom/dicom-tags/
 # https://support.dcmtk.org/docs/wlmscpfs.html
 
+CHARSETS = {
+    "ISO_IR 100": "iso-8859-1",
+    "ISO_IR 101": "iso-8859-2",
+    "ISO_IR 109": "iso-8859-3",
+    "ISO_IR 110": "iso-8859-4",
+    "ISO_IR 144": "iso-8859-5",
+    "ISO_IR 127": "iso-8859-6",
+    "ISO_IR 126": "iso-8859-7",
+    "ISO_IR 138": "iso-8859-8",
+    "ISO_IR 148": "iso-8859-9",
+    "ISO_IR 192": "utf-8",
+}
+SPECIFICCHARACTERSET = "ISO_IR 192"
+
 
 def __calculate_space_list(values):
     size = 8
@@ -36,7 +50,7 @@ def __write_property(file, code, datatype, content):
         if len(content) % 2 != 0 and datatype != "UI":
             content += " "
 
-        content = content.encode()
+        content = content.encode(CHARSETS[SPECIFICCHARACTERSET])
         file.write(_pack("I", len(content))[:2])
         file.write(content)
     else:
@@ -72,7 +86,7 @@ def write_file_worklist(data):
         with open(file_worklist, "wb") as f:
             f.write(header)
 
-            __write_property(f, "0008,0005", "CS", "ISO_IR 192")
+            __write_property(f, "0008,0005", "CS", SPECIFICCHARACTERSET)
 
             __write_property(f, "0008,0020", "DA", worklist.study_date)
             __write_property(f, "0008,0030", "TM", worklist.study_time)
